@@ -1,18 +1,18 @@
-from django.urls import path
-from rest_framework import routers
+from django.urls import path, include
+
 from . import views
-from rest_framework.authtoken.views import obtain_auth_token
 
+from rest_framework.routers import DefaultRouter
 
+router: DefaultRouter = DefaultRouter()
+router.register(r'tables', views.BookingViewSet)
 
 urlpatterns = [
-    path('menu-items/', views.MenuItemsView.as_view()),
-    path('menu-items/<int:pk>', views.SingleMenuItemView.as_view()),
-    path('message/', views.msg),
-    path('api-token-auth/', obtain_auth_token)
+    path('', views.index, name='home'),
+    path('about/', views.about, name="about"),
+    path('menu/', views.MenuItemsView.as_view(), name='menu'),
+    path('reservations/', views.reservations, name="reservations"),
+    # API paths
+    path('menu/<int:pk>', views.SingleMenuItemView.as_view(), name='menu-item'),
+    path('booking/', include(router.urls)),
 ]
-
-
-
-
-

@@ -5,27 +5,38 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime
-from rest_framework.decorators import api_view, permission_classes
 
 from .serializers import BookingSerializer, MenuSerializer
-from .models import Booking, Menu, MenuItem
+from .models import Booking, Menu
 
-# Create your views here.
+# 
+# API views
+#
 class MenuItemsView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
+    
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
 
 class SingleMenuItemView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
-
-@api_view()
-@permission_classes([IsAuthenticated])
-# @authentication_classes([TokenAuthentication])
-def msg(request):
-    return Response({"message":"This view is protected"})
-
+    
 class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    
     queryset = Booking.objects.all()
+#
+# Page views
+#
+def index(request: HttpRequest) -> HttpResponse:
+    return render(request, 'index.html', {})
+
+def about(request):
+    return render(request, 'about.html')
+
+def reservations(request:HttpRequest) -> HttpResponse:
+    date = request.GET.get('date',datetime.today().date())
+    bookings = Booking.objects.all()
+    booking_json = serializers.serialize('json', bookings)
+    return render(request, 'reservations.html',{"bookings":booking_json})
